@@ -1,78 +1,78 @@
-import Image from "next/image";
-import { Geist, Geist_Mono } from "next/font/google";
+/*
+This is a Next.js react component - using tailwind CSS for styling which acts as the frontend for a simple 
+web application. 
+purpose: Fetch a random business idea from a backend API and display it on the screen  
+*/
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+"use client" 
+//Tells next.js that this is a Client Component - explicitly tells Next.js to run this on the user's browser. 
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import { useEffect, useState } from 'react';
+
+/*
+This imports two important React built-in helper functions (hooks). 
+
+Usestate: used to store and update data like the business idea insid the Component
+
+useEffect: used to trigger side effects, in this case - feteching data from API as soon as the page finishes 
+loading
+*/
 
 export default function Home() {
-  return (
-    <div
-      className={`${geistSans.className} ${geistMono.className} flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black`}
-    >
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the index.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs/pages/getting-started?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
-  );
+  //This defines thw main react component called Home and xports it to Next.js knows to render it as the main page
+
+    const [idea, setIdea] = useState<string>('…loading');
+    /*
+    This is bassically setting uy=p a dynamic display board. idea is the actual text which will show up on the screen. 
+    Right now it is set to display '....loading' by default. 
+
+    SetIdea is a special tool used to change what the display says. Its like a remote which will be used to chanyge 
+    the text from ...loading to the actual idea. 
+
+    <string> is the rule telling the computer that this display board is only alllowed to show text letters adnd
+    not numbers or images. 
+     */
+
+    useEffect(() => { //starts the hook which will run the code aftet the component first appears on the screen. 
+        fetch('/api') 
+        /* This is an HTTP request to /api which is a backend endpoint on the same server - to ask for the 
+        business idea */
+            .then(res => res.text()) 
+            //Once the server responds this line is to convert that raw response into plain text. 
+            .then(setIdea)//The plain text/ business idea is passed into the setIdea function 
+            //so idea is updated from loading to the actual business text
+            .catch(err => setIdea('Error: ' + err.message));
+            //If somehting goes wrong idea will be updated to display the error message instead of the application crashing
+
+    }, []);
+// [] this empty arrray is important because now React knows that this whiole fetch code needs to be run only 
+//once when the page first loads - so the inifnite loop of fetching and relaodng is avoided. 
+
+// Now to render the UI: 
+    return (
+        <main className="p-8 font-sans">
+          {/*p-8: adds space of about 32 px around the whole page and font-sans is to fix the font to sans-serif */}
+            <h1 className="text-3xl font-bold mb-4">
+                Business Idea Generator
+            </h1>
+            {/*This is for the main title of the page:
+            text-3xl makes the text quite large 
+            font bold makes the title bold. 
+            mb-4 adds a margin at the bottom to push the coontent below it down. 
+            */}
+            <div className="w-full max-w-2xl p-6 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm">
+{/*This is to create a stylised container card to hold the business idea.
+w-full max-w-2xl : this makes the card responsive - full width for small screens and capped at a nice size on larger screens 
+bg-white dark:bg-gray-800: this sets a white background, but automatically switches to dark gray if user is in dark mode 
+border border-gray-300 rounded-lg: Gives the card rounded corners and a light border. 
+*/}
+                <p className="text-gray-900 dark:text-gray-100 whitespace-pre-wrap">
+                    {idea}
+                </p>
+                {/* Prints the idea text onto thr screen. 
+                whitespace-pre-wrap: A very useful CSS class that preserves line breaks and spacing. If the 
+                generated business idea is a multi-paragraph plan, it won't bunch up into a single ugly block of text. */}
+            </div>
+        </main>
+    );
 }
