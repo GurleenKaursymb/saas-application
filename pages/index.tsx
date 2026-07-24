@@ -34,7 +34,7 @@ export default function Home() {
      */
 
     useEffect(() => { //starts the hook which will run the code aftet the component first appears on the screen. 
-        fetch('/api') 
+        fetch('/api/') 
         /* This is an HTTP request to /api which is a backend endpoint on the same server - to ask for the 
         business idea */
             .then(res => res.text()) 
