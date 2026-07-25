@@ -33,18 +33,12 @@ export default function Home() {
     not numbers or images. 
      */
 
-    useEffect(() => { //starts the hook which will run the code aftet the component first appears on the screen. 
-        fetch('/api/') 
-        /* This is an HTTP request to /api which is a backend endpoint on the same server - to ask for the 
-        business idea */
-            .then(res => res.text()) 
-            //Once the server responds this line is to convert that raw response into plain text. 
-            .then(setIdea)//The plain text/ business idea is passed into the setIdea function 
-            //so idea is updated from loading to the actual business text
-            .catch(err => setIdea('Error: ' + err.message));
-            //If somehting goes wrong idea will be updated to display the error message instead of the application crashing
-
-    }, []);
+    useEffect(() => {
+        fetch('/api/')
+          .then(res => res.json())
+          .then(data => setIdea(data.result))
+          .catch(err => setIdea('Error: ' + err.message));
+      }, []);
 // [] this empty arrray is important because now React knows that this whiole fetch code needs to be run only 
 //once when the page first loads - so the inifnite loop of fetching and relaodng is avoided. 
 
