@@ -65,3 +65,7 @@ Next i'm updating the backend prompt in iindex.py like changing rhw prompt sent 
 I'm also replacing the raw text UI in React (pages/index.tsx) with a styled Markdown parser (react-markdown) and glassmorphism Tailwind CSS styling.
 
 
+So far i've successfully added Real time streaming and Professional UI to this LLM app that i'm making. 
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Day 3 / -26/07/2026- / 
