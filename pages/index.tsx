@@ -1,71 +1,62 @@
-/*
-This is a Next.js react component - using tailwind CSS for styling which acts as the frontend for a simple 
-web application. 
-purpose: Fetch a random business idea from a backend API and display it on the screen  
-*/
-
-"use client" 
-//Tells next.js that this is a Client Component - explicitly tells Next.js to run this on the user's browser. 
+"use client"
 
 import { useEffect, useState } from 'react';
-
-/*
-This imports two important React built-in helper functions (hooks). 
-
-Usestate: used to store and update data like the business idea insid the Component
-
-useEffect: used to trigger side effects, in this case - feteching data from API as soon as the page finishes 
-loading
-*/
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
 
 export default function Home() {
-  //This defines thw main react component called Home and xports it to Next.js knows to render it as the main page
-
     const [idea, setIdea] = useState<string>('…loading');
-    /*
-    This is bassically setting uy=p a dynamic display board. idea is the actual text which will show up on the screen. 
-    Right now it is set to display '....loading' by default. 
-
-    SetIdea is a special tool used to change what the display says. Its like a remote which will be used to chanyge 
-    the text from ...loading to the actual idea. 
-
-    <string> is the rule telling the computer that this display board is only alllowed to show text letters adnd
-    not numbers or images. 
-     */
 
     useEffect(() => {
-        fetch('/api/')
-          .then(res => res.json())
-          .then(data => setIdea(data.result))
-          .catch(err => setIdea('Error: ' + err.message));
-      }, []);
-// [] this empty arrray is important because now React knows that this whiole fetch code needs to be run only 
-//once when the page first loads - so the inifnite loop of fetching and relaodng is avoided. 
+        const evt = new EventSource('/api');
+        let buffer = '';
 
-// Now to render the UI: 
+        evt.onmessage = (e) => {
+            buffer += e.data;
+            setIdea(buffer);
+        };
+        evt.onerror = () => {
+            console.error('SSE error, closing');
+            evt.close();
+        };
+
+        return () => { evt.close(); };
+    }, []);
+
     return (
-        <main className="p-8 font-sans">
-          {/*p-8: adds space of about 32 px around the whole page and font-sans is to fix the font to sans-serif */}
-            <h1 className="text-3xl font-bold mb-4">
-                Business Idea Generator
-            </h1>
-            {/*This is for the main title of the page:
-            text-3xl makes the text quite large 
-            font bold makes the title bold. 
-            mb-4 adds a margin at the bottom to push the coontent below it down. 
-            */}
-            <div className="w-full max-w-2xl p-6 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm">
-{/*This is to create a stylised container card to hold the business idea.
-w-full max-w-2xl : this makes the card responsive - full width for small screens and capped at a nice size on larger screens 
-bg-white dark:bg-gray-800: this sets a white background, but automatically switches to dark gray if user is in dark mode 
-border border-gray-300 rounded-lg: Gives the card rounded corners and a light border. 
-*/}
-                <p className="text-gray-900 dark:text-gray-100 whitespace-pre-wrap">
-                    {idea}
-                </p>
-                {/* Prints the idea text onto thr screen. 
-                whitespace-pre-wrap: A very useful CSS class that preserves line breaks and spacing. If the 
-                generated business idea is a multi-paragraph plan, it won't bunch up into a single ugly block of text. */}
+        <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+            <div className="container mx-auto px-4 py-12">
+                {/* Header */}
+                <header className="text-center mb-12">
+                    <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-4">
+                        Business Idea Generator
+                    </h1>
+                    <p className="text-gray-600 dark:text-gray-400 text-lg">
+                        AI-powered innovation at your fingertips
+                    </p>
+                </header>
+
+                {/* Content Card */}
+                <div className="max-w-3xl mx-auto">
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 backdrop-blur-lg bg-opacity-95">
+                        {idea === '…loading' ? (
+                            <div className="flex items-center justify-center py-12">
+                                <div className="animate-pulse text-gray-400">
+                                    Generating your business idea...
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="markdown-content text-gray-700 dark:text-gray-300">
+                                <ReactMarkdown
+                                    remarkPlugins={[remarkGfm, remarkBreaks]}
+                                >
+                                    {idea}
+                                </ReactMarkdown>
+                            </div>
+                        )}
+                    </div>
+                </div>
             </div>
         </main>
     );
